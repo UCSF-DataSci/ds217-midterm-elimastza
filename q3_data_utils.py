@@ -5,6 +5,7 @@
 # These utilities will be imported and used in Q4-Q7 notebooks.
 
 #!/usr/bin/env python3
+from hashlib import new
 from IPython.display import display
 import pandas as pd
 import numpy as np
@@ -93,14 +94,14 @@ def fill_missing(df: pd.DataFrame, column: str, strategy: str = 'mean') -> pd.Da
     return df_ffill
 
 filters = [
-        {'column': 'age', 'condition': 'greater_than', 'value': 80},
+        {'column': 'age', 'condition': 'greater_than', 'value': 65},
         {'column': 'bmi', 'condition': 'less_than', 'value': 18.5},
         {'column': 'sex', 'condition': 'in_list', 'value': ['Female', 'Male']},
-        {'column': 'systolic_bp', 'condition': 'in_range', 'value': [120, 140]}, 
+        {'column': 'systolic_bp', 'condition': 'greater than', 'value': 140}, 
         {'column': 'diastolic_bp', 'condition': 'in_range', 'value': [80, 90]},
-        {'column': 'cholestrol_total', 'condition': 'in_range', 'value': [200, 240]},
-        {'column': 'cholestrol_hdl', 'condition': 'greater_than', 'value': 40},
-        {'column': 'cholestrol_ldl', 'condition': 'less_than', 'value': 160},
+        {'column': 'cholesterol_total', 'condition': 'in_range', 'value': [200, 240]},
+        {'column': 'cholesterol_hdl', 'condition': 'greater_than', 'value': 40},
+        {'column': 'cholesterol_ldl', 'condition': 'less_than', 'value': 160},
         {'column': 'glucose_fasting', 'condition': 'less_than', 'value': 100},
         {'column': 'site', 'condition': 'in_list', 'value': ['Site A', 'Site B', 'Site C']},
         {'column': 'intervention_group', 'condition': 'in_list', 'value': ['Control', 'Treatment']},
@@ -111,6 +112,7 @@ filters = [
         {'column': 'dropout', 'condition': 'equals', 'value': 0}
                  
     ]
+    
 
 def filter_data(df: pd.DataFrame, filters: list) -> pd.DataFrame:
     """
@@ -142,10 +144,23 @@ def filter_data(df: pd.DataFrame, filters: list) -> pd.DataFrame:
         >>> filters = [{'column': 'age', 'condition': 'in_range', 'value': [18, 65]}]
         >>> df_filtered = filter_data(df, filters)
     """
+    for f in filters:
+        column = f['column']
+        condition = f['condition']
+        value = f['value']
 
+        if condition == 'equals':
+            df = df[df[column] == value]
+        elif condition == 'greater_than':
+            df = df[df[column] > value]
+        elif condition == 'less_than':
+            df = df[df[column] < value]
+        elif condition == 'in_range':
+            df = df[(df[column] >= value[0]) & (df[column] <= value[1])]
+        elif condition == 'in_list':
+            df = df[df[column].isin(value)]
     return df
-    
-    return filter_data(df, filters)
+
 
 type_map = {
         'patient_id': 'string',
@@ -225,49 +240,12 @@ def create_bins(df: pd.DataFrame, column: str, bins: list,
         ...     labels=['<18', '18-34', '35-49', '50-64', '65+']
         ... )
     """
-    ages = df['age']
-    age_groups = pd.cut(ages, bins=[0, 18, 35, 50, 65, 100], labels=['<18', '18-34', '35-49', '50-64', '65+'])
-    df['age_groups'] = age_groups
-
-    bmi = df['bmi']
-    bmi_groups = pd.cut(bmi, bins=[0, 18.5, 24.9, 30, 50], labels=['<18.5', '18.5-24.9', '25-29.9', '30+'])
-    df['bmi_groups'] = bmi_groups
-
-    sbp = df['systolic_bp']
-    sbp_groups = pd.cut(sbp, bins=[0, 120, 130, 140, 180], labels=['<120', '120-129', '130-139', '140+'])
-    df['sbp_groups'] = sbp_groups
-
-    dbp = df['diastolic_bp']
-    dbp_groups = pd.cut(dbp, bins=[0, 80, 90, 120], labels=['<80', '80-89', '90+']) 
-    df['dbp_groups'] = dbp_groups   
-
-    cholesterol_total = df['cholesterol_total']
-    cholesterol_total_groups = pd.cut(cholesterol_total, bins=[0, 200, 240, 400], labels=['<200', '200-239', '240+'])
-    df['cholesterol_total_groups'] = cholesterol_total_groups
-
-    cholesterol_hdl = df['cholesterol_hdl']
-    cholesterol_hdl_groups = pd.cut(cholesterol_hdl, bins=[0, 40, 60, 100], labels=['<40', '40-59', '60+'])
-    df['cholesterol_hdl_groups'] = cholesterol_hdl_groups
-
-    cholesterol_ldl = df['cholesterol_ldl']
-    cholesterol_ldl_groups = pd.cut(cholesterol_ldl, bins=[0, 100, 160, 300], labels=['<100', '100-159', '160+'])
-    df['cholesterol_ldl_groups'] = cholesterol_ldl_groups
-
-    glucose_fasting = df['glucose_fasting']
-    glucose_fasting_groups = pd.cut(glucose_fasting, bins=[0, 100, 125, 300], labels=['<100', '100-124', '125+'])
-    df['glucose_fasting_groups'] = glucose_fasting_groups
-
-    follow_up_months = df['follow_up_months']
-    follow_up_months_groups = pd.cut(follow_up_months, bins=[0, 6, 12, 24, 50], labels=['<6', '6-11', '12-23', '24+'])
-    df['follow_up_months_groups'] = follow_up_months_groups
-
-    adherence_pct = df['adherence_pct']
-    adherence_pct_groups = pd.cut(adherence_pct, bins=[0, 50, 80, 100], labels=['<50', '50-79', '80-100'])
-    df['adherence_pct_groups'] = adherence_pct_groups
-
-    return df[adherence_pct_groups, age_groups, bmi_groups, sbp_groups, dbp_groups, cholesterol_total_groups, cholesterol_hdl_groups, cholesterol_ldl_groups, glucose_fasting_groups, follow_up_months_groups]
-
-
+    df = df.copy()
+    if new_column is None:
+        new_column = f"{column}_binned"
+    df[new_column] = pd.cut(df[column], bins=bins, labels=labels)
+    return df
+    
 
 def summarize_by_group(df: pd.DataFrame, group_col: str,
                        agg_dict: dict = None) -> pd.DataFrame:
@@ -302,8 +280,6 @@ def summarize_by_group(df: pd.DataFrame, group_col: str,
 
 
 
-
-
 if __name__ == '__main__':
     # Optional: Test your utilities here
     print("Data utilities loaded successfully!")
@@ -331,20 +307,38 @@ if __name__ == '__main__':
     print(fill_missing(df, 'dropout', strategy='ffill'))
     print(fill_missing(df, 'site', strategy='ffill'))
     print(fill_missing(df, 'intervention_group', strategy='ffill'))
-    #print(filter_data(df, 'filters'))
+    
+    # Test filter_data with proper filter list
+    test_filters = [{'column': 'age', 'condition': 'greater_than', 'value': 75}]
+    print(filter_data(df, test_filters))
+    
     print(transform_types(df, type_map))
     
     # Apply binning
-    df = create_bins(df, 'age', bins=[0, 18, 35, 50, 65, 100], labels=['<18', '18-34', '35-49', '50-64', '65+'])
-    print(df['age_groups'].value_counts())
+    df = create_bins(df, 'age', bins=[0, 18, 35, 50, 65, 100], labels=['<18', '18-34', '35-49', '50-64', '65+'], new_column='age_binned')
+    print(df['age_binned'].value_counts())
+    
+    df = create_bins(df, 'bmi', bins=[0, 18.5, 25, 30, 35, 40, 100], labels=['<18.5', '18.5-24.9', '25-29.9', '30-34.9', '35-39.9', '40+'], new_column='bmi_groups')
     print(df['bmi_groups'].value_counts())
+
+    df = create_bins(df, 'systolic_bp', bins=[0, 120, 130, 140, 160, 180, 200], labels=['<120', '120-129', '130-139', '140-159', '160-179', '180+'], new_column='sbp_groups')
     print(df['sbp_groups'].value_counts())
+
+    df = create_bins(df, 'diastolic_bp', bins=[0, 80, 85, 90, 100, 110, 120], labels=['<80', '80-84', '85-89', '90-99', '100-109', '110+'], new_column='dbp_groups')
     print(df['dbp_groups'].value_counts())
+
+    df = create_bins(df, 'cholesterol_total', bins=[0, 200, 240, 280, 320, 360], labels=['<200', '200-239', '240-279', '280-319', '320+'], new_column='cholesterol_total_groups')
     print(df['cholesterol_total_groups'].value_counts())
+
+    df = create_bins(df, 'cholesterol_hdl', bins=[0, 40, 60, 80, 100], labels=['<40', '40-59', '60-79', '80+'], new_column='cholesterol_hdl_groups')
     print(df['cholesterol_hdl_groups'].value_counts())
+    df = create_bins(df, 'cholesterol_ldl', bins=[0, 100, 130, 160, 190, 220], labels=['<100', '100-129', '130-159', '160-189', '190+'], new_column='cholesterol_ldl_groups')
     print(df['cholesterol_ldl_groups'].value_counts())
+    df = create_bins(df, 'glucose_fasting', bins=[0, 100, 125, 150, 200], labels=['<100', '100-124', '125-149', '150+'], new_column='glucose_fasting_groups')
     print(df['glucose_fasting_groups'].value_counts())
+    df = create_bins(df, 'follow_up_months', bins=[0, 6, 12, 18, 24, 36, 50], labels=['<6', '6-11', '12-17', '18-23', '24-35', '36+'], new_column='follow_up_months_groups')
     print(df['follow_up_months_groups'].value_counts())
+    df = create_bins(df, 'adherence_pct', bins=[0, 50, 80, 90, 100], labels=['<50', '50-79', '80-89', '90-100'], new_column='adherence_pct_groups')
     print(df['adherence_pct_groups'].value_counts())
     print(summarize_by_group(df, 'site'))
 

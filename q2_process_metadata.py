@@ -7,25 +7,16 @@
 filename = "q2_config.txt"
 if filename.endswith(".txt"):
     print("Processing txt file")
-
-def config(dict) -> None:
-    with open('q2_config.txt', 'r') as file:
-        for line in file:
-            content = file.read()
-    print(f"File content: {content}")
-    return config
     
-sample_data_rows = 100
-sample_data_min = 18
-sample_data_max = 75
 
 def parse_config(filepath: str) -> dict:
+    config = {}
     with open(filepath, 'r') as file:
         lines = file.readlines()
     for line in lines:
-        config == {sample_data_rows == '100', sample_data_min == '18',sample_data_max == '75'}
-    return parse_config
-    
+        key, value = line.strip().split(['='])
+        config[key] = value
+    return config
 
 
     # TODO: Read file, split on '=', create dict
@@ -44,18 +35,19 @@ def validate_config(config: dict) -> dict:
     sample_data_max > sample_data_min else:
     sample_data_max = "Invalid" """
 
-        
-    for sample_data_rows in config.get('sample_data_rows'):
-        if not isinstance(sample_data_rows > 0, (int, float)):
-            raise ValueError(f"Invalid sample_data_rows type: {type(sample_data_rows)}")
+    config_keys = ['sample_data_rows', 'sample_data_min', 'sample_data_max']
+    for key in config_keys:
+        if key not in config:
+            config[key] = "Invalid"
+        if not isinstance(config[key], (int, float)):
+            raise ValueError(f"Invalid sample_data_rows type: {type(config['sample_data_rows'])}")
 
-    for sample_data_min in config.get('sample_data_min'):
-        if not isinstance(sample_data_min >= 1, (int, float)):
-            raise ValueError(f"Invalid sample_data_min type: {type(sample_data_min)}")
+        if not isinstance(config['sample_data_min'], (int, float)):
+            raise ValueError(f"Invalid sample_data_min type: {type(config['sample_data_min'])}")
 
-    for sample_data_max in config.get('sample_data_max'):
-        if not isinstance(sample_data_max > sample_data_min, (int, float)):
-            raise ValueError(f"Invalid sample_data_max type: {type(sample_data_max)}")
+
+        if not isinstance(config['sample_data_max'], (int, float)):
+            raise ValueError(f"Invalid sample_data_max type: {type(config['sample_data_max'])}")
 
     return validate_config 
 
@@ -68,7 +60,7 @@ def generate_sample_data(filename: str, config: dict) -> None:
     # TODO: Parse config values (convert strings to int)
     # TODO: Generate random numbers and save to file
     # TODO: Use random module with config-specified range
-    pass
+
 
 
 def calculate_statistics(data: list) -> dict:
@@ -87,7 +79,7 @@ def calculate_statistics(data: list) -> dict:
         30.0
     """
     # TODO: Calculate stats
-    pass
+  
 
 
 if __name__ == '__main__':
@@ -99,4 +91,4 @@ if __name__ == '__main__':
     # 
     # TODO: Read the generated file and calculate statistics
     # TODO: Save statistics to output/statistics.txt
-    pass
+ 

@@ -1,0 +1,6 @@
+Missing Data Report
+==================================================
+
+Original rows: 10000
+Clean rows: 10000
+Rows removed: 0

@@ -2,70 +2,69 @@
 # Assignment 5, Question 2: Python Data Processing
 # Process configuration files for data generation.
 
+#!/usr/bin/env python3
+
+filename = "q2_config.txt"
+if filename.endswith(".txt"):
+    print("Processing txt file")
+
+def config(dict) -> None:
+    with open('q2_config.txt', 'r') as file:
+        for line in file:
+            content = file.read()
+    print(f"File content: {content}")
+    return config
+    
+sample_data_rows = 100
+sample_data_min = 18
+sample_data_max = 75
 
 def parse_config(filepath: str) -> dict:
-    """
-    Parse config file (key=value format) into dictionary.
+    with open(filepath, 'r') as file:
+        lines = file.readlines()
+    for line in lines:
+        config == {sample_data_rows == '100', sample_data_min == '18',sample_data_max == '75'}
+    return parse_config
+    
 
-    Args:
-        filepath: Path to q2_config.txt
 
-    Returns:
-        dict: Configuration as key-value pairs
-
-    Example:
-        >>> config = parse_config('q2_config.txt')
-        >>> config['sample_data_rows']
-        '100'
-    """
     # TODO: Read file, split on '=', create dict
-    pass
-
+pass
+# TODO:Validate config values with if/elif/else logic, sample_data_rows must be an int and > 0, sample_data_min must be an int and >= 1, sample_data_max must be an int and > sample_data_min
 
 def validate_config(config: dict) -> dict:
-    """
-    Validate configuration values using if/elif/else logic.
+    """ 
+    sample_data_rows = int 
+    sample_data_rows > 0 else: 
+    sample_data_rows = "Invalid"
+    sample_data_min = int
+    sample_data_min >= 1 else:
+    sample_data_min = "Invalid"
+    sample_data_max = int
+    sample_data_max > sample_data_min else:
+    sample_data_max = "Invalid" """
 
-    Rules:
-    - sample_data_rows must be an int and > 0
-    - sample_data_min must be an int and >= 1
-    - sample_data_max must be an int and > sample_data_min
+        
+    for sample_data_rows in config.get('sample_data_rows'):
+        if not isinstance(sample_data_rows > 0, (int, float)):
+            raise ValueError(f"Invalid sample_data_rows type: {type(sample_data_rows)}")
 
-    Args:
-        config: Configuration dictionary
+    for sample_data_min in config.get('sample_data_min'):
+        if not isinstance(sample_data_min >= 1, (int, float)):
+            raise ValueError(f"Invalid sample_data_min type: {type(sample_data_min)}")
 
-    Returns:
-        dict: Validation results {key: True/False}
+    for sample_data_max in config.get('sample_data_max'):
+        if not isinstance(sample_data_max > sample_data_min, (int, float)):
+            raise ValueError(f"Invalid sample_data_max type: {type(sample_data_max)}")
 
-    Example:
-        >>> config = {'sample_data_rows': '100', 'sample_data_min': '18', 'sample_data_max': '75'}
-        >>> results = validate_config(config)
-        >>> results['sample_data_rows']
-        True
-    """
+    return validate_config 
+
     # TODO: Implement with if/elif/else
-    pass
 
+ 
 
 def generate_sample_data(filename: str, config: dict) -> None:
-    """
-    Generate a file with random numbers for testing, one number per row with no header.
-    Uses config parameters for number of rows and range.
-
-    Args:
-        filename: Output filename (e.g., 'sample_data.csv')
-        config: Configuration dictionary with sample_data_rows, sample_data_min, sample_data_max
-
-    Returns:
-        None: Creates file on disk
-
-    Example:
-        >>> config = {'sample_data_rows': '100', 'sample_data_min': '18', 'sample_data_max': '75'}
-        >>> generate_sample_data('sample_data.csv', config)
-        # Creates file with 100 random numbers between 18-75, one per row
-        >>> import random
-        >>> random.randint(18, 75)  # Returns random integer between 18-75
-    """
+    
     # TODO: Parse config values (convert strings to int)
     # TODO: Generate random numbers and save to file
     # TODO: Use random module with config-specified range
